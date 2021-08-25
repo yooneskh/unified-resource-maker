@@ -4,8 +4,10 @@ import { paramCase } from 'https://deno.land/x/case@v2.1.0/mod.ts';
 
 const [ model, basePath ] = Deno.args;
 const modelSnaked = paramCase(model);
+const depthNumber = Deno.args[2] || 3;
+const depthNormalizer = '../'.repeat(depthNumber);
 
-console.log({ model, basePath, modelSnaked });
+console.log({ model, basePath, modelSnaked, depthNormalizer });
 
 
 const baseDirectory = `${basePath}/${modelSnaked}`;
@@ -18,7 +20,7 @@ const routerFile = `${baseDirectory}/${modelSnaked}-router.ts`;
 
 
 const interfacesContent = `import { Document } from 'mongoose';
-import { IResource } from '../../../plugins/resource-maker/resource-model-types';
+import { IResource } from '${depthNormalizer}plugins/resource-maker/resource-model-types';
 
 
 export interface I${model}Base extends IResource {
@@ -26,7 +28,7 @@ export interface I${model}Base extends IResource {
 } export interface I${model} extends I${model}Base, Document {}
 `;
 
-const resourceContent = `import { ResourceMaker } from '../../../plugins/resource-maker/resource-maker';
+const resourceContent = `import { ResourceMaker } from '${depthNormalizer}plugins/resource-maker/resource-maker';
 import { I${model}, I${model}Base } from './${modelSnaked}-interfaces';
 
 
