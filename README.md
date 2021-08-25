@@ -1,5 +1,5 @@
 # YResource Skeleton Maker
-This is a personal tool to make frequesntly made backend skeleton files quickly. It is made with deno and compiled to a executable.
+This is a personal tool to make frequently made backend skeleton files quickly. It is made with deno and compiled to an executable.
 
 # Compilation
 ```
