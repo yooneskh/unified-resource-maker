@@ -4,7 +4,7 @@ import { paramCase } from 'https://deno.land/x/case@v2.1.0/mod.ts';
 
 const [ model, basePath ] = Deno.args;
 const modelSnaked = paramCase(model);
-const depthNumber = Deno.args[2] || 3;
+const depthNumber = parseInt(Deno.args[2], 10) || 3;
 const depthNormalizer = '../'.repeat(depthNumber);
 
 console.log({ model, basePath, modelSnaked, depthNormalizer });
