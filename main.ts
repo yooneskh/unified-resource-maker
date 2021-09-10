@@ -67,27 +67,27 @@ import './${modelSnaked}-controller';
 
 
 ${model}Maker.addActions([
-  {
+  { // list
     template: 'LIST',
     permissions: ['admin.${modelSnaked}.list']
   },
-  {
+  { // list-count
     template: 'LIST_COUNT',
     permissions: ['admin.${modelSnaked}.list-count']
   },
-  {
+  { // retrieve
     template: 'RETRIEVE',
     permissions: ['admin.${modelSnaked}.retrieve']
   },
-  {
+  { // create
     template: 'CREATE',
     permissions: ['admin.${modelSnaked}.create']
   },
-  {
+  { // update
     template: 'UPDATE',
     permissions: ['admin.${modelSnaked}.update']
   },
-  {
+  { // delete
     template: 'DELETE',
     permissions: ['admin.${modelSnaked}.delete']
   }
