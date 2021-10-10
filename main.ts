@@ -1,104 +1,99 @@
-import { ensureDir, ensureFile } from 'https://deno.land/std@0.106.0/fs/mod.ts';
+import { ensureFile } from 'https://deno.land/std@0.106.0/fs/mod.ts';
 import { paramCase } from 'https://deno.land/x/case@v2.1.0/mod.ts';
+import { plural } from 'https://deno.land/x/deno_plural@1.0.1/mod.ts';
 
 
-const [ model, basePath ] = Deno.args;
+const [ model, basePath, depthArg ] = Deno.args;
 const modelSnaked = paramCase(model);
-const depthNumber = parseInt(Deno.args[2], 10) || 3;
+const modelSnakedPlural = paramCase(plural(model));
+const depthNumber = parseInt(depthArg, 10) || 2;
 const depthNormalizer = '../'.repeat(depthNumber);
 
-console.log({ model, basePath, modelSnaked, depthNormalizer });
+console.log({ model, basePath, modelSnaked, modelSnakedPlural, depthNumber, depthNormalizer });
 
 
-const baseDirectory = `${basePath}/${modelSnaked}`;
+const baseDirectory = `${basePath}/${modelSnakedPlural}`;
 
-const interfacesFile = `${baseDirectory}/${modelSnaked}-interfaces.d.ts`;
-const resourceFile = `${baseDirectory}/${modelSnaked}-resource.ts`;
-const modelFile = `${baseDirectory}/${modelSnaked}-model.ts`;
-const controllerFile = `${baseDirectory}/${modelSnaked}-controller.ts`;
-const routerFile = `${baseDirectory}/${modelSnaked}-router.ts`;
-
-
-const interfacesContent = `import { Document } from 'mongoose';
-import { IResource } from '${depthNormalizer}plugins/resource-maker/resource-model-types';
+const interfacesFile = `${baseDirectory}/${modelSnakedPlural}-interfaces.d.ts`;
+const resourceFile = `${baseDirectory}/${modelSnakedPlural}-resource.ts`;
+const modelFile = `${baseDirectory}/${modelSnakedPlural}-model.ts`;
+const controllerFile = `${baseDirectory}/${modelSnakedPlural}-controller.ts`;
+const routerFile = `${baseDirectory}/${modelSnakedPlural}-router.ts`;
 
 
-export interface I${model}Base extends IResource {
+const interfacesContent = (
+`import { IResourceBase } from '${depthNormalizer}plugins/resource-maker/resource-model.d.ts';
 
-} export interface I${model} extends I${model}Base, Document {}
-`;
 
-const resourceContent = `import { ResourceMaker } from '${depthNormalizer}plugins/resource-maker/resource-maker';
-import { I${model}, I${model}Base } from './${modelSnaked}-interfaces';
+export interface I${model}Base {
+  name: string;
+} export interface I${model} extends I${model}Base, IResourceBase {}
+`);
+
+const resourceContent = (
+`import { ResourceMaker } from '${depthNormalizer}plugins/resource-maker/resource-maker.ts';
+import { I${model}Base, I${model} } from './${modelSnakedPlural}-interfaces.d.ts';
 
 
 export const ${model}Maker = new ResourceMaker<I${model}Base, I${model}>('${model}');
-`;
+`);
 
-const modelContent = `import { ${model}Maker } from './${modelSnaked}-resource';
+const modelContent = (
+`import { ${model}Maker } from './${modelSnakedPlural}-resource.ts';
 
 
-${model}Maker.addProperties([
-  {
-    key: 'name',
+${model}Maker.setProperties({
+  name: {
     type: 'string',
     required: true,
     title: 'نام',
     titleable: true
   }
-]);
+});
 
 
-export const ${model}Model = ${model}Maker.getModel();
-`;
+${model}Maker.makeModel();
+`);
 
-const controllerContent = `import { ${model}Maker } from './${modelSnaked}-resource';
-import './${modelSnaked}-model';
+const controllerContent = (
+`import { ${model}Maker } from './${modelSnakedPlural}-resource.ts';
+import './${modelSnakedPlural}-model.ts';
 
 
 export const ${model}Controller = ${model}Maker.getController();
+`);
+
+const routerContent = (
+`import { ${model}Maker } from './${modelSnakedPlural}-resource.ts';
+import './${modelSnakedPlural}-controller.ts';
 
 
-${model}Maker.setValidations({ });
-`;
-
-const routerContent = `import { ${model}Maker } from './${modelSnaked}-resource';
-import './${modelSnaked}-controller';
-
-
-${model}Maker.addActions([
-  { // list
-    template: 'LIST',
-    permissions: ['admin.${modelSnaked}.list']
+${model}Maker.addActions({
+  'list': {
+    template: 'list'
   },
-  { // list-count
-    template: 'LIST_COUNT',
-    permissions: ['admin.${modelSnaked}.list-count']
+  'count': {
+    template: 'count'
   },
-  { // retrieve
-    template: 'RETRIEVE',
-    permissions: ['admin.${modelSnaked}.retrieve']
+  'retrieve': {
+    template: 'retrieve'
   },
-  { // create
-    template: 'CREATE',
-    permissions: ['admin.${modelSnaked}.create']
+  'create': {
+    template: 'create'
   },
-  { // update
-    template: 'UPDATE',
-    permissions: ['admin.${modelSnaked}.update']
+  'update': {
+    template: 'update'
   },
-  { // delete
-    template: 'DELETE',
-    permissions: ['admin.${modelSnaked}.delete']
+  'delete': {
+    template: 'delete'
   }
-]);
+});
 
 
 export const ${model}Router = ${model}Maker.getRouter();
-`;
+`);
 
 
-await ensureDir(baseDirectory);
 await ensureFile(interfacesFile);
 await ensureFile(resourceFile);
 await ensureFile(modelFile);
