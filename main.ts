@@ -70,22 +70,28 @@ import './${modelSnakedPlural}-controller.ts';
 
 ${model}Maker.addActions({
   'list': {
-    template: 'list'
+    template: 'list',
+    permission: 'admin.${modelSnaked}.list'
   },
   'count': {
-    template: 'count'
+    template: 'count',
+    permission: 'admin.${modelSnaked}.count'
   },
   'retrieve': {
-    template: 'retrieve'
+    template: 'retrieve',
+    permission: 'admin.${modelSnaked}.retrieve'
   },
   'create': {
-    template: 'create'
+    template: 'create',
+    permission: 'admin.${modelSnaked}.create'
   },
   'update': {
-    template: 'update'
+    template: 'update',
+    permission: 'admin.${modelSnaked}.update'
   },
   'delete': {
-    template: 'delete'
+    template: 'delete',
+    permission: 'admin.${modelSnaked}.delete'
   }
 });
 
