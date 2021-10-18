@@ -61,6 +61,9 @@ import './${modelSnakedPlural}-model.ts';
 
 
 export const ${model}Controller = ${model}Maker.getController();
+
+
+${model}Maker.addValidations({ });
 `);
 
 const routerContent = (
