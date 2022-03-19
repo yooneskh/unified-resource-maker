@@ -14,11 +14,11 @@ console.log({ model, basePath, modelSnaked, modelSnakedPlural, depthNumber, dept
 
 const baseDirectory = `${basePath}/${modelSnakedPlural}`;
 
-const interfacesFile = `${baseDirectory}/${modelSnakedPlural}-interfaces.d.ts`;
-const resourceFile = `${baseDirectory}/${modelSnakedPlural}-resource.ts`;
-const modelFile = `${baseDirectory}/${modelSnakedPlural}-model.ts`;
-const controllerFile = `${baseDirectory}/${modelSnakedPlural}-controller.ts`;
-const routerFile = `${baseDirectory}/${modelSnakedPlural}-router.ts`;
+const interfacesFile = `${baseDirectory}/interfaces.d.ts`;
+const resourceFile = `${baseDirectory}/resource.ts`;
+const modelFile = `${baseDirectory}/model.ts`;
+const controllerFile = `${baseDirectory}/controller.ts`;
+const routerFile = `${baseDirectory}/router.ts`;
 
 
 const interfacesContent = (
@@ -32,14 +32,14 @@ export interface I${model}Base {
 
 const resourceContent = (
 `import { SettingResourceMaker } from '${depthNormalizer}plugins/setting-resource-maker/setting-resource-maker.ts';
-import { I${model}Base, I${model} } from './${modelSnakedPlural}-interfaces.d.ts';
+import { I${model}Base, I${model} } from './interfaces.d.ts';
 
 
 export const ${model}Maker = new SettingResourceMaker<I${model}Base, I${model}>('${model}');
 `);
 
 const modelContent = (
-`import { ${model}Maker } from './${modelSnakedPlural}-resource.ts';
+`import { ${model}Maker } from './resource.ts';
 
 
 ${model}Maker.setProperties({
@@ -56,8 +56,8 @@ ${model}Maker.makeModel();
 `);
 
 const controllerContent = (
-`import { ${model}Maker } from './${modelSnakedPlural}-resource.ts';
-import './${modelSnakedPlural}-model.ts';
+`import { ${model}Maker } from './resource.ts';
+import './model.ts';
 
 
 export const ${model}Controller = ${model}Maker.getController();
@@ -67,8 +67,8 @@ ${model}Maker.addValidations({ });
 `);
 
 const routerContent = (
-`import { ${model}Maker } from './${modelSnakedPlural}-resource.ts';
-import './${modelSnakedPlural}-controller.ts';
+`import { ${model}Maker } from './resource.ts';
+import './controller.ts';
 
 
 ${model}Maker.addActions({
