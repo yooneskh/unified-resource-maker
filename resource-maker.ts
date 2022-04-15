@@ -3,13 +3,14 @@ import { paramCase } from 'https://deno.land/x/case@v2.1.0/mod.ts';
 import { plural } from 'https://deno.land/x/deno_plural@1.0.1/mod.ts';
 
 
-const [ model, basePath, depthArg ] = Deno.args;
+const [ model, basePath, depthArg, moduleName ] = Deno.args;
 const modelSnaked = paramCase(model);
 const modelSnakedPlural = paramCase(plural(model));
+const moduleNameSnaked = moduleName ? paramCase(moduleName) : '';
 const depthNumber = parseInt(depthArg, 10) || 2;
 const depthNormalizer = '../'.repeat(depthNumber);
 
-console.log({ model, basePath, modelSnaked, modelSnakedPlural, depthNumber, depthNormalizer });
+console.log({ model, basePath, modelSnaked, modelSnakedPlural, moduleName, moduleNameSnaked, depthNumber, depthNormalizer });
 
 
 const baseDirectory = `${basePath}/${modelSnakedPlural}`;
@@ -74,27 +75,27 @@ import './controller.ts';
 ${model}Maker.addActions({
   'list': {
     template: 'list',
-    permission: 'admin.${modelSnaked}.list'
+    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.list'
   },
   'count': {
     template: 'count',
-    permission: 'admin.${modelSnaked}.count'
+    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.count'
   },
   'retrieve': {
     template: 'retrieve',
-    permission: 'admin.${modelSnaked}.retrieve'
+    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.retrieve'
   },
   'create': {
     template: 'create',
-    permission: 'admin.${modelSnaked}.create'
+    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.create'
   },
   'update': {
     template: 'update',
-    permission: 'admin.${modelSnaked}.update'
+    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.update'
   },
   'delete': {
     template: 'delete',
-    permission: 'admin.${modelSnaked}.delete'
+    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.delete'
   }
 });
 
