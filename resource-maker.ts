@@ -23,7 +23,7 @@ const routerFile = `${baseDirectory}/router.ts`;
 
 
 const interfacesContent = (
-`import { IResourceBase } from '${depthNormalizer}plugins/resource-maker/resource-model.d.ts';
+`import { IResourceBase } from '${depthNormalizer}plugins/resource-maker/model.d.ts';
 
 
 export interface I${model}Base {
@@ -32,7 +32,7 @@ export interface I${model}Base {
 `);
 
 const resourceContent = (
-`import { ResourceMaker } from '${depthNormalizer}plugins/resource-maker/resource-maker.ts';
+`import { ResourceMaker } from '${depthNormalizer}plugins/resource-maker/maker.ts';
 import { I${model}Base, I${model} } from './interfaces.d.ts';
 
 
