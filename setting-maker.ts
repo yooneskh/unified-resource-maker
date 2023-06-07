@@ -3,14 +3,12 @@ import { paramCase } from 'https://deno.land/x/case@v2.1.0/mod.ts';
 import { plural } from 'https://deno.land/x/deno_plural@1.0.1/mod.ts';
 
 
-const [ model, basePath, depthArg, moduleName ] = Deno.args;
+const [ model, basePath, moduleName ] = Deno.args;
 const modelSnaked = paramCase(model);
 const modelSnakedPlural = paramCase(plural(model));
 const moduleNameSnaked = moduleName ? paramCase(moduleName) : '';
-const depthNumber = parseInt(depthArg, 10) || 2;
-const depthNormalizer = '../'.repeat(depthNumber);
 
-console.log({ model, basePath, modelSnaked, modelSnakedPlural, moduleName, moduleNameSnaked, depthNumber, depthNormalizer });
+console.log({ model, basePath, modelSnaked, modelSnakedPlural, moduleName, moduleNameSnaked });
 
 
 const baseDirectory = `${basePath}/${modelSnakedPlural}`;
@@ -23,7 +21,7 @@ const routerFile = `${baseDirectory}/router.ts`;
 
 
 const interfacesContent = (
-`import { IResourceBase } from '${depthNormalizer}plugins/resource-maker/model.d.ts';
+`import { IResourceBase } from 'resource-maker';
 
 
 export interface I${model}Base {
@@ -32,7 +30,7 @@ export interface I${model}Base {
 `);
 
 const resourceContent = (
-`import { SettingResourceMaker } from '${depthNormalizer}plugins/setting-resource-maker/setting-resource-maker.ts';
+`import { SettingResourceMaker } from 'setting-resource-maker';
 import { I${model}Base, I${model} } from './interfaces.d.ts';
 
 
