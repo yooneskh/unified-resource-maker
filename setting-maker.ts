@@ -1,6 +1,6 @@
-import { ensureFile } from 'https://deno.land/std@0.106.0/fs/mod.ts';
-import { paramCase } from 'https://deno.land/x/case@v2.1.0/mod.ts';
-import { plural } from 'https://deno.land/x/deno_plural@1.0.1/mod.ts';
+import { ensureFile } from 'https://deno.land/std@0.220.1/fs/mod.ts';
+import { paramCase } from 'https://deno.land/x/case@2.2.0/mod.ts';
+import { plural } from 'https://deno.land/x/deno_plural@2.0.0/mod.ts';
 
 
 const [ model, basePath, moduleName ] = Deno.args;
