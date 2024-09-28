@@ -1,28 +1,36 @@
-# YResource Skeleton Maker
-This is a personal tool to make frequently made backend skeleton files quickly. It is made with deno and compiled to an executable.
+# Unified Resource Maker
 
-# Compilation
-```
-deno compile --allow-all --unstable main.ts
-```
+This is a personal tool to make frequently made backend skeleton files quickly. It is made with deno.
+
 
 # Usage
-Put the made binary in $PATH. use like this.
+
+You can directly call the script from the github.
 ```
-resource-maker ExamParticipation .
+deno run -A https://raw.githubusercontent.com/yooneskh/unified-resource-maker/refs/heads/master/resource-maker.ts User
 ```
 
 This skeleton wil be made in CWD
 
 ```
 ./
--- exam-participation/
----- exam-participation-interfaces.d.ts
----- exam-participation-resource.ts
----- exam-participation-model.ts
----- exam-participation-controller.ts
----- exam-participation-router.ts
+-- users/
+---- mod.ts
 ```
 
-# TO Do
-- Decrease size of the binary
+You can alias this command to use it more easily.
+
+```
+alias deno-make-resource="deno run -A https://raw.githubusercontent.com/yooneskh/unified-resource-maker/refs/heads/master/resource-maker.ts"
+deno-make-resource User ./domains/ Authentication
+```
+
+This will be made.
+
+```
+./
+-- domains/
+---- authentication/
+------ users/
+-------- mod.ts
+```

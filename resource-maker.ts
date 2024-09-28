@@ -1,119 +1,108 @@
-import { ensureFile } from 'https://deno.land/std@0.220.1/fs/mod.ts';
-import { paramCase } from 'https://deno.land/x/case@2.2.0/mod.ts';
-import { plural } from 'https://deno.land/x/deno_plural@2.0.0/mod.ts';
+import { dash, camel } from 'npm:radash@12.1.0';
+import pluralize from 'npm:pluralize@8.0.0';
+import { ensureFile } from 'jsr:@std/fs@0.229.2';
 
 
 const [ model, basePath, moduleName ] = Deno.args;
-const modelSnaked = paramCase(model);
-const modelSnakedPlural = paramCase(plural(model));
-const moduleNameSnaked = moduleName ? paramCase(moduleName) : '';
-
-console.log({ model, basePath, modelSnaked, modelSnakedPlural, moduleName, moduleNameSnaked });
 
 
-const baseDirectory = `${basePath}/${modelSnakedPlural}`;
+const directoryPath = `${basePath ? basePath : './'}${moduleName ? (dash(moduleName) + '/') : ('')}${dash(pluralize(model))}`;
+const filePath = `${directoryPath}/mod.ts`;
 
-const interfacesFile = `${baseDirectory}/interfaces.d.ts`;
-const resourceFile = `${baseDirectory}/resource.ts`;
-const modelFile = `${baseDirectory}/model.ts`;
-const controllerFile = `${baseDirectory}/controller.ts`;
-const routerFile = `${baseDirectory}/router.ts`;
+await ensureFile(filePath);
 
 
-const interfacesContent = (
-`import { IResourceBase } from 'resource-maker';
+const fileContent = `
+import type { IUnifiedApp } from 'unified-app';
+import type { IUnifiedModel, IUnifiedController } from 'unified-resources';
+import type { IBaseDocument } from 'unified-kv';
+import { createUnifiedController } from 'unified-resources';
 
 
-export interface I${model}Base {
+interface I${model}Base {
   name: string;
-} export interface I${model} extends I${model}Base, IResourceBase {};
-`);
+} export interface I${model} extends I${model}Base, IBaseDocument {}
 
-const resourceContent = (
-`import { ResourceMaker } from 'resource-maker';
-import { I${model}Base, I${model} } from './interfaces.d.ts';
-
-
-export const ${model}Maker = new ResourceMaker<I${model}Base, I${model}>('${model}');
-`);
-
-const modelContent = (
-`import { ${model}Maker } from './resource.ts';
-
-
-${model}Maker.setProperties({
+const ${model}Schema: IUnifiedModel<I${model}Base> = {
   name: {
     type: 'string',
     required: true,
     titleable: true,
   },
-});
+};
 
 
-${model}Maker.makeModel();
-`);
-
-const controllerContent = (
-`import { ${model}Maker } from './resource.ts';
-import './model.ts';
-
-
-export const ${model}Controller = ${model}Maker.getController();
+declare module 'unified-app' {
+  interface IUnifiedApp {
+    ${camel(pluralize(model))}: IUnifiedController<I${model}Base>;
+  }
+}
 
 
-${model}Maker.addValidations({
+export function install(app: IUnifiedApp) {
 
-});
-`);
+  app.addModel('${model}', ${model}Schema);
 
-const routerContent = (
-`import { ${model}Maker } from './resource.ts';
-import './controller.ts';
+  app.${camel(pluralize(model))} = createUnifiedController<I${model}Base>(app, '${model}', ${model}Schema);
 
 
-${model}Maker.addActions({
-  'list': {
-    template: 'list',
-    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.list',
-  },
-  'count': {
-    template: 'count',
-    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.count',
-  },
-  'retrieve': {
-    template: 'retrieve',
-    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.retrieve',
-  },
-  'create': {
-    template: 'create',
-    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.create',
-  },
-  'update': {
-    template: 'update',
-    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.update',
-  },
-  'delete': {
-    template: 'delete',
-    permission: 'admin${moduleNameSnaked ? `.${moduleNameSnaked}` : ''}.${modelSnaked}.delete',
-  },
-});
+  app.addActions({
+    'meta': {
+      method: 'get',
+      path: '/${dash(pluralize(model))}/meta',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.meta',
+      handler: () => {
+        return app.models['${model}'];
+      },
+    },
+    'list': {
+      template: 'list',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.list',
+    },
+    'count': {
+      template: 'count',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.count',
+    },
+    'retrieve': {
+      template: 'retrieve',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.retrieve',
+    },
+    'create': {
+      template: 'create',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.create',
+    },
+    'update': {
+      template: 'update',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.update',
+    },
+    'replace': {
+      template: 'replace',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.replace',
+    },
+    'delete': {
+      template: 'delete',
+      controller: app.${camel(pluralize(model))},
+      pathPrefix: '/${dash(pluralize(model))}',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.delete',
+    },
+  });
+
+}
+`;
+
+await Deno.writeTextFile(filePath, fileContent.slice(1));
 
 
-export const ${model}Router = ${model}Maker.getRouter();
-`);
-
-
-await ensureFile(interfacesFile);
-await Deno.writeTextFile(interfacesFile, interfacesContent);
-
-await ensureFile(resourceFile);
-await Deno.writeTextFile(resourceFile, resourceContent);
-
-await ensureFile(modelFile);
-await Deno.writeTextFile(modelFile, modelContent);
-
-await ensureFile(controllerFile);
-await Deno.writeTextFile(controllerFile, controllerContent);
-
-await ensureFile(routerFile);
-await Deno.writeTextFile(routerFile, routerContent);
+console.log(`${filePath} created successfully!`);
