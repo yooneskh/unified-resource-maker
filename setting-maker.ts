@@ -45,6 +45,14 @@ export function install(app: IUnifiedApp) {
 
 
   app.addActions({
+    'meta': {
+      method: 'get',
+      path: '/${dash(pluralize(model))}/meta',
+      requirePermission: 'admin.${moduleName ? (dash(moduleName) + '.') : ''}${dash(pluralize(model))}.meta',
+      handler: () => {
+        return app.models['${model}'];
+      },
+    },
     'retrieve': {
       method: 'get',
       path: '/${dash(pluralize(model))}/',
